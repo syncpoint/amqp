@@ -1,0 +1,12 @@
+{
+  "queue": {
+    "hello": { "durable": false },
+    "tasks": { "durable": true }
+  },
+  "exchange": {
+    "events": {
+      "type": "fanout",
+      "options": { "durable": false }
+    }
+  }
+}

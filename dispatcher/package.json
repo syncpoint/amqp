@@ -1,0 +1,18 @@
+{
+  "name": "dispatcher",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./dispatch.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@syncpoint/signal": "^1.1.0",
+    "amqplib": "^0.10.4",
+    "ramda": "^0.29.1",
+    "uuid-random": "^1.3.2"
+  }
+}

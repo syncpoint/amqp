@@ -1,0 +1,16 @@
+{
+  "name": "publisher",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./publish.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.10.4",
+    "ramda": "^0.29.1"
+  }
+}

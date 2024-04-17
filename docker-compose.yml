@@ -1,0 +1,127 @@
+name: amqp-stack
+
+networks:
+  amqp-net:
+    driver: bridge
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: boost-rabbit
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - amqp-net
+    # rabbitmq takes up to 5 seconds to be ready
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 30s
+      retries: 3
+
+  consumer:
+    image: consumer
+    # just for fun: fire up three consumer instances
+    deploy:
+      mode: replicated
+      replicas: 3
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: consumer
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      RMQHOST: rabbitmq
+    volumes:
+      - ./config.json:/opt/config.json # shared queue configurations
+    networks:
+      - amqp-net
+
+  producer:
+    image: producer
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: producer
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      RMQHOST: rabbitmq
+    volumes:
+      - ./config.json:/opt/config.json # shared queue configurations
+    networks:
+      - amqp-net
+
+  publisher:
+    image: publisher
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: publisher
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      RMQHOST: rabbitmq
+    volumes:
+      - ./config.json:/opt/config.json # shared queue configurations
+    networks:
+      - amqp-net
+
+  subscriber:
+    image: subscriber
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: subscriber
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      RMQHOST: rabbitmq
+    deploy:
+      mode: replicated
+      replicas: 3
+    volumes:
+      - ./config.json:/opt/config.json # shared queue configurations
+    networks:
+      - amqp-net
+
+  dispatcher:
+    image: dispatcher
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: dispatcher
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      RMQHOST: rabbitmq
+    volumes:
+      - ./config.json:/opt/config.json # shared queue configurations
+    networks:
+      - amqp-net
+
+  worker:
+    image: worker
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: worker
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      RMQHOST: rabbitmq
+    deploy:
+      mode: replicated
+      replicas: 2
+    volumes:
+      - ./config.json:/opt/config.json # shared queue configurations
+    networks:
+      - amqp-net
