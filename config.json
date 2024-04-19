@@ -1,12 +1,6 @@
 {
-  "queue": {
-    "hello": { "durable": false },
-    "tasks": { "durable": true }
-  },
-  "exchange": {
-    "events": {
-      "type": "fanout",
-      "options": { "durable": false }
-    }
-  }
+  "exchange:events": { "name": "boost.events", "type": "fanout", "durable": false },
+  "exchange:emitter": { "name": "boost.emitter", "type": "topic", "durable": true },
+  "queue:hello": { "name": "boost.hello", "durable": false },
+  "queue:tasks": { "name": "boost.tasks", "durable": true }
 }

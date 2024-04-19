@@ -1,29 +1,7 @@
 #!/usr/bin/env node
-import fs from 'fs'
 import amqp from 'amqplib'
-import * as R from 'ramda'
 import uuid from 'uuid-random'
-
-const env = {}
-env.RMQHOST = process.env.RMQHOST || 'localhost'
-env.url = `amqp://${env.RMQHOST}`
-
-const readJSON = R.tryCatch(
-  filename => JSON.parse(fs.readFileSync(filename, 'utf8')),
-  R.always(null)
-)
-
-const readConfig = () =>
-  ['/opt/config.json', '../config.json']
-    .reduce((acc, filename) =>
-      acc ? acc : readJSON(filename),
-      null
-    )
-
-const assertQueue = R.curry(
-  (config, queueName, channel) =>
-    channel.assertQueue(queueName, config.queue[queueName])
-)
+import { env, config } from './config.js'
 
 const logEvents = (tag, emitter) => {
   emitter.on(`[dispatcher/event] ${tag}/error`, err => console.log('error', err, tag))
@@ -35,8 +13,6 @@ const logEvents = (tag, emitter) => {
 }
 
 ;(async () => {
-    const config = readConfig()
-
     // Active connection keeps process from terminating.
     // Forced connection closure closes connection and thus terminates process.
     // In case nothing else prevents process from stopping,
@@ -55,8 +31,7 @@ const logEvents = (tag, emitter) => {
     const channel = await connection.createChannel()
     logEvents('channel', channel)
 
-    const queueName = 'tasks'
-    await assertQueue(config, queueName, channel)
+    const { queue: queueName } = await config.assertQueue('tasks', channel)
 
     const dispatch = event => {
       try {
