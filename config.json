@@ -2,5 +2,7 @@
   "exchange:events": { "name": "boost.events", "type": "fanout", "durable": false },
   "exchange:emitter": { "name": "boost.emitter", "type": "topic", "durable": true },
   "queue:hello": { "name": "boost.hello", "durable": false },
-  "queue:tasks": { "name": "boost.tasks", "durable": true }
+  "queue:tasks": { "name": "boost.tasks", "durable": true },
+  "queue:listener-a": { "name": "boost.emitter.a", "durable": true },
+  "queue:listener-b": { "name": "boost.emitter.b", "durable": true }
 }

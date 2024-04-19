@@ -125,3 +125,51 @@ services:
       - ./config.json:/opt/config.json # shared queue configurations
     networks:
       - amqp-net
+
+  emitter:
+    image: emitter
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: emitter
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      RMQHOST: rabbitmq
+    volumes:
+      - ./config.json:/opt/config.json # shared queue configurations
+    networks:
+      - amqp-net
+
+  listener-a:
+    image: listener-a
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: listener-a
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      RMQHOST: rabbitmq
+    volumes:
+      - ./config.json:/opt/config.json # shared queue configurations
+    networks:
+      - amqp-net
+
+  listener-b:
+    image: listener-b
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: listener-b
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      RMQHOST: rabbitmq
+    volumes:
+      - ./config.json:/opt/config.json # shared queue configurations
+    networks:
+      - amqp-net
